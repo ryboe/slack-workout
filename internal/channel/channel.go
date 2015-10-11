@@ -19,13 +19,15 @@ const (
 var apiToken string
 
 type channelListResponse struct {
-	Ok       bool      `json:"ok"`
 	Channels []Channel `json:"channels"`
+	Ok       bool      `json:"ok"`
+	Err      string    `json:"error,omitempty"`
 }
 
 type channelResponse struct {
 	Ok      bool    `json:"ok"`
 	Channel Channel `json:"channel"`
+	Err     string  `json:"error,omitempty"`
 }
 
 type Channel struct {
@@ -99,7 +101,7 @@ func (ch *Channel) UpdateMembers() error {
 	}
 
 	if !cr.Ok {
-		return errors.New("Slack API returned an error")
+		return fmt.Errorf("Slack API returned error: %s", cr.Err)
 	}
 
 	ch.Members = cr.Channel.Members
