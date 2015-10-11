@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"os"
 
-	"channel"
+	"github.com/y0ssar1an/slack-pushups/internal/channel"
 )
 
 const slackbotURL = "https://%s.slack.com/services/hooks/slackbot?%s"
