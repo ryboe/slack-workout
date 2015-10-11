@@ -86,7 +86,7 @@ func (ch *Channel) UpdateMembers() error {
 		"channel": ch.Id,
 		"token":   apiToken,
 	}
-	channelURL := makeURL(apiURL, "channel.info", qsp)
+	channelURL := makeURL(apiURL, "channels.info", qsp)
 
 	resp, err := http.Get(channelURL)
 	if err != nil {
