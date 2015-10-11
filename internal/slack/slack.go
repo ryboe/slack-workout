@@ -1,5 +1,5 @@
 // TODO: write package comment
-package channel
+package slack
 
 import (
 	"encoding/json"
@@ -43,7 +43,7 @@ func init() {
 	}
 }
 
-func New(name string) (Channel, error) {
+func NewChannel(name string) (Channel, error) {
 	var emptyChannel Channel
 
 	qsp := map[string]string{
@@ -119,4 +119,21 @@ func queryString(qsp map[string]string) string {
 		vals.Add(k, v)
 	}
 	return vals.Encode()
+}
+
+func prettyJSON(js interface{}) (string, error) {
+	prettyJs, err := json.MarshalIndent(&js, "", "    ")
+	if err != nil {
+		return "", err
+	}
+	return string(prettyJs), nil
+}
+
+type User struct {
+	Id   string
+	Name string
+}
+
+func NewUser(id string) (User, error) {
+	// TODO: call slack API to get user name from ID
 }
