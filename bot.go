@@ -131,7 +131,7 @@ func prettyJSON(js interface{}) (string, error) {
 // 	return vals.Encode()
 // }
 
-func randomMember(ch Channel, nextMember chan string) {
+func randomMember(ch channel.Channel, nextMember chan string) {
 	var err error
 	for {
 		err = ch.UpdateMembers()
