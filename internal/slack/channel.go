@@ -42,7 +42,7 @@ func NewChannel(team, name string) (Channel, error) {
 
 	qsp := &url.Values{}
 	qsp.Set("channel", name)
-	listURL := NewSlackURL(team, "channels.list", qsp)
+	listURL := NewURL(team, "channels.list", qsp)
 	cl := channelListResponse{}
 	err := apiCall(listURL, &cl)
 	if err != nil {
@@ -70,7 +70,7 @@ func (ch Channel) String() string {
 func (ch *Channel) UpdateMembers() error {
 	qsp := &url.Values{}
 	qsp.Set("channel", ch.ID)
-	channelURL := NewSlackURL(ch.Team, "channels.info", qsp)
+	channelURL := NewURL(ch.Team, "channels.info", qsp)
 
 	cr := channelResponse{}
 	err := apiCall(channelURL, &cr)

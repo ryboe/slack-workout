@@ -16,28 +16,22 @@ func (err APIError) Error() string {
 	return fmt.Sprintf("Slack API returned error: %s", err.msg)
 }
 
-type SlackURL struct {
-	url.URL
-}
-
-func NewSlackURL(team, method string, qsp *url.Values) SlackURL {
+func NewURL(team, method string, qsp *url.Values) url.URL {
 	if qsp == nil {
 		qsp = &url.Values{}
 	}
 
 	qsp.Set("token", apiToken)
-	return SlackURL{
-		url.URL{
-			Scheme:   "https",
-			Host:     team + ".slack.com",
-			Path:     "api/" + method,
-			RawQuery: qsp.Encode(),
-		},
+	return url.URL{
+		Scheme:   "https",
+		Host:     team + ".slack.com",
+		Path:     "api/" + method,
+		RawQuery: qsp.Encode(),
 	}
 }
 
-func apiCall(su SlackURL, respStruct interface{}) error {
-	resp, err := http.Get(su.String())
+func apiCall(u url.URL, respStruct interface{}) error {
+	resp, err := http.Get(u.String())
 	if err != nil {
 		return err
 	}

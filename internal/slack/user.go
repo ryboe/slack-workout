@@ -18,7 +18,7 @@ type User struct {
 func NewUser(team, name string) (User, error) {
 	var emptyUser User
 
-	userURL := NewSlackURL(team, "users.list", nil)
+	userURL := NewURL(team, "users.list", nil)
 	ur := userListResponse{}
 	err := apiCall(userURL, &ur)
 	if err != nil {
