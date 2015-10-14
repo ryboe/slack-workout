@@ -62,8 +62,6 @@ func NewChannel(team, name string) (Channel, error) {
 
 	if cl.Ok != true {
 		return emptyChannel, APIError{cl.Err}
-		// TODO: delete me
-		// return emptyChannel, errors.New("failed to get channel list from Slack API")
 	}
 
 	for _, ch := range cl.Channels {

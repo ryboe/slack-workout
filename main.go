@@ -11,19 +11,9 @@ import (
 const (
 	minPushUps = 10
 	maxPushUps = 30
-	// TODO: may not need this.
-	slackbotURL = "https://%s.slack.com/services/hooks/slackbot?%s"
 )
 
-// TODO: may not need this. sending messages as user, not slackbot
-// var botToken = os.Getenv("SLACK_BOT_TOKEN")
-
 func main() {
-	// TODO; delete this
-	// if botToken == "" {
-	// 	log.Fatal("SLACK_BOT_TOKEN not set")
-	// }
-
 	ch, err := slack.NewChannel("monkeytacos", "api-test")
 	if err != nil {
 		log.Fatal(err)
@@ -32,8 +22,18 @@ func main() {
 	// DEBUG
 	fmt.Println(ch)
 
+	u, err := slack.NewUser("monkeytacos", "sgtmittens")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// DEBUG
+	fmt.Println(u)
+
 	err = ch.UpdateMembers()
-	fmt.Println("ERRR:", err)
+
+	// DEBUG
+	fmt.Println("ERR AFTER UPDATEMEMBERS()?:", err)
 
 	// nextMember := make(chan string)
 	// go randomMember(ch, nextMember)

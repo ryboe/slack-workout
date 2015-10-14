@@ -15,7 +15,7 @@ type userResponse struct {
 }
 
 type userListResponse struct {
-	Users []User `json:"users"`
+	Users []User `json:"members"`
 	Ok    bool   `json:"ok"`
 	Err   string `json:"error,omitempty"`
 }
