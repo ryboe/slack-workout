@@ -51,21 +51,9 @@ func NewChannel(team, name string) (Channel, error) {
 		return emptyChannel, err
 	}
 
-	// resp, err := http.Get(listURL.String())
-	// if err != nil {
-	// 	return emptyChannel, err
-	// }
-	// defer resp.Body.Close()
-
-	// var cl channelListResponse
-	// err = json.NewDecoder(resp.Body).Decode(&cl)
-	// if err != nil {
-	// 	return emptyChannel, err
-	// }
-
-	// if cl.Ok != true {
-	// 	return emptyChannel, APIError{cl.Err}
-	// }
+	if cl.Ok != true {
+		return emptyChannel, APIError{cl.Err}
+	}
 
 	for _, ch := range cl.Channels {
 		if ch.Name == name {
@@ -92,21 +80,9 @@ func (ch *Channel) UpdateMembers() error {
 		return err
 	}
 
-	// resp, err := http.Get(channelURL.String())
-	// if err != nil {
-	// 	return err
-	// }
-	// defer resp.Body.Close()
-
-	// cr := channelResponse{}
-	// err = json.NewDecoder(resp.Body).Decode(&cr)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// if !cr.Ok {
-	// 	return APIError{cr.Err}
-	// }
+	if !cr.Ok {
+		return APIError{cr.Err}
+	}
 
 	ch.Members = cr.Channel.Members
 	return nil

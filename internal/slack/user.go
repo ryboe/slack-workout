@@ -32,21 +32,9 @@ func NewUser(team, name string) (User, error) {
 		return emptyUser, err
 	}
 
-	// resp, err := http.Get(userURL.String())
-	// if err != nil {
-	// 	return emptyUser, err
-	// }
-	// defer resp.Body.Close()
-
-	// ur := userListResponse{}
-	// err = json.NewDecoder(resp.Body).Decode(&ur)
-	// if err != nil {
-	// 	return emptyUser, err
-	// }
-
-	// if !ur.Ok {
-	// 	return emptyUser, APIError{ur.Err}
-	// }
+	if !ur.Ok {
+		return emptyUser, APIError{ur.Err}
+	}
 
 	for _, u := range ur.Users {
 		if u.Name == name {

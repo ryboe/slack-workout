@@ -17,7 +17,7 @@ func (err APIError) Error() string {
 }
 
 type SlackURL struct {
-	u url.URL
+	url.URL
 }
 
 func NewSlackURL(team, method string, qsp *url.Values) SlackURL {
@@ -27,7 +27,7 @@ func NewSlackURL(team, method string, qsp *url.Values) SlackURL {
 
 	qsp.Set("token", apiToken)
 	return SlackURL{
-		u: url.URL{
+		url.URL{
 			Scheme:   "https",
 			Host:     team + ".slack.com",
 			Path:     "api/" + method,
@@ -37,7 +37,7 @@ func NewSlackURL(team, method string, qsp *url.Values) SlackURL {
 }
 
 func apiCall(su SlackURL, respStruct interface{}) error {
-	resp, err := http.Get(su.u.String())
+	resp, err := http.Get(su.String())
 	if err != nil {
 		return err
 	}
@@ -48,26 +48,8 @@ func apiCall(su SlackURL, respStruct interface{}) error {
 		return err
 	}
 
-	if !respStruct.Ok {
-		return APIError{respStruct.Err}
-	}
-
 	return nil
 }
-
-// TODO: delete this
-// func makeURL(slackURL, team, method string, qsp map[string]string) string {
-// 	qs := queryString(qsp)
-// 	return fmt.Sprintf(apiURL, team, method, qs)
-// }
-
-// func queryString(qsp map[string]string) string {
-// 	vals := url.Values{}
-// 	for k, v := range qsp {
-// 		vals.Add(k, v)
-// 	}
-// 	return vals.Encode()
-// }
 
 func prettyJSON(js interface{}) (string, error) {
 	prettyJs, err := json.MarshalIndent(&js, "", "    ")

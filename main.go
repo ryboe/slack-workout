@@ -90,7 +90,7 @@ func randomMember(ch slack.Channel, mittensId string, nextMember chan string) {
 
 		// prevent mittens from picking self
 		for ch.Members[i] == mittensId {
-			i := rand.Intn(len(ch.Members))
+			i = rand.Intn(len(ch.Members))
 		}
 
 		nextMember <- ch.Members[i]
