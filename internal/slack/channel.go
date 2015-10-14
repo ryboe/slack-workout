@@ -8,21 +8,19 @@ import (
 	"os"
 )
 
-const apiURL = "https://%s.slack.com/api/%s?%s"
-
 var apiToken string
 
 // TODO: can i get rid of one of these response types?
 type channelResponse struct {
 	Channel Channel `json:"channel"`
 	Ok      bool    `json:"ok"`
-	Err     string  `json:"error,omitempty"`
+	Err     string  `json:"error"`
 }
 
 type channelListResponse struct {
 	Channels []Channel `json:"channels"`
 	Ok       bool      `json:"ok"`
-	Err      string    `json:"error,omitempty"`
+	Err      string    `json:"error"`
 }
 
 type Channel struct {

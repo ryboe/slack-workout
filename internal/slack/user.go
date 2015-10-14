@@ -3,17 +3,10 @@ package slack
 
 import "fmt"
 
-// TODO: can i get rid of one of these types?
-type userResponse struct {
-	User User   `json:"user"`
-	Ok   bool   `json:"ok"`
-	Err  string `json:"error,omitempty"`
-}
-
 type userListResponse struct {
 	Users []User `json:"members"`
 	Ok    bool   `json:"ok"`
-	Err   string `json:"error,omitempty"`
+	Err   string `json:"error"`
 }
 
 type User struct {
