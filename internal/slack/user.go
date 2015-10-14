@@ -1,11 +1,7 @@
 // TODO: write package comment
 package slack
 
-import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-)
+import "fmt"
 
 // TODO: can i get rid of one of these types?
 type userResponse struct {
@@ -29,26 +25,28 @@ type User struct {
 func NewUser(team, name string) (User, error) {
 	var emptyUser User
 
-	qsp := map[string]string{
-		"token": apiToken,
-	}
-	userURL := makeURL(apiURL, team, "users.list", qsp)
-
-	resp, err := http.Get(userURL)
-	if err != nil {
-		return emptyUser, err
-	}
-	defer resp.Body.Close()
-
+	userURL := NewSlackURL(team, "users.list", nil)
 	ur := userListResponse{}
-	err = json.NewDecoder(resp.Body).Decode(&ur)
+	err := apiCall(userURL, &ur)
 	if err != nil {
 		return emptyUser, err
 	}
 
-	if !ur.Ok {
-		return emptyUser, APIError{ur.Err}
-	}
+	// resp, err := http.Get(userURL.String())
+	// if err != nil {
+	// 	return emptyUser, err
+	// }
+	// defer resp.Body.Close()
+
+	// ur := userListResponse{}
+	// err = json.NewDecoder(resp.Body).Decode(&ur)
+	// if err != nil {
+	// 	return emptyUser, err
+	// }
+
+	// if !ur.Ok {
+	// 	return emptyUser, APIError{ur.Err}
+	// }
 
 	for _, u := range ur.Users {
 		if u.Name == name {

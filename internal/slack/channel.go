@@ -2,10 +2,9 @@
 package slack
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -27,7 +26,7 @@ type channelListResponse struct {
 }
 
 type Channel struct {
-	Id      string   `json:"id"`
+	ID      string   `json:"id"`
 	Name    string   `json:"name"`
 	Members []string `json:"members"`
 	Team    string   // set in NewChannel
@@ -43,26 +42,30 @@ func init() {
 func NewChannel(team, name string) (Channel, error) {
 	var emptyChannel Channel
 
-	qsp := map[string]string{
-		"channel": name,
-		"token":   apiToken,
-	}
-	listURL := makeURL(apiURL, team, "channels.list", qsp)
-	resp, err := http.Get(listURL)
-	if err != nil {
-		return emptyChannel, err
-	}
-	defer resp.Body.Close()
-
-	var cl channelListResponse
-	err = json.NewDecoder(resp.Body).Decode(&cl)
+	qsp := &url.Values{}
+	qsp.Set("channel", name)
+	listURL := NewSlackURL(team, "channels.list", qsp)
+	cl := channelListResponse{}
+	err := apiCall(listURL, &cl)
 	if err != nil {
 		return emptyChannel, err
 	}
 
-	if cl.Ok != true {
-		return emptyChannel, APIError{cl.Err}
-	}
+	// resp, err := http.Get(listURL.String())
+	// if err != nil {
+	// 	return emptyChannel, err
+	// }
+	// defer resp.Body.Close()
+
+	// var cl channelListResponse
+	// err = json.NewDecoder(resp.Body).Decode(&cl)
+	// if err != nil {
+	// 	return emptyChannel, err
+	// }
+
+	// if cl.Ok != true {
+	// 	return emptyChannel, APIError{cl.Err}
+	// }
 
 	for _, ch := range cl.Channels {
 		if ch.Name == name {
@@ -75,32 +78,35 @@ func NewChannel(team, name string) (Channel, error) {
 }
 
 func (ch Channel) String() string {
-	return fmt.Sprintf("Channel{Id: %s, Name: %s, Members: %v, Team: %s}", ch.Id, ch.Name, ch.Members, ch.Team)
+	return fmt.Sprintf("Channel{ID: %s, Name: %s, Members: %v, Team: %s}", ch.ID, ch.Name, ch.Members, ch.Team)
 }
 
 func (ch *Channel) UpdateMembers() error {
-	qsp := map[string]string{
-		"channel": ch.Id,
-		"token":   apiToken,
-	}
-	channelURL := makeURL(apiURL, ch.Team, "channels.info", qsp)
-
-	// TODO: DRY out API calls
-	resp, err := http.Get(channelURL)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+	qsp := &url.Values{}
+	qsp.Set("channel", ch.ID)
+	channelURL := NewSlackURL(ch.Team, "channels.info", qsp)
 
 	cr := channelResponse{}
-	err = json.NewDecoder(resp.Body).Decode(&cr)
+	err := apiCall(channelURL, &cr)
 	if err != nil {
 		return err
 	}
 
-	if !cr.Ok {
-		return APIError{cr.Err}
-	}
+	// resp, err := http.Get(channelURL.String())
+	// if err != nil {
+	// 	return err
+	// }
+	// defer resp.Body.Close()
+
+	// cr := channelResponse{}
+	// err = json.NewDecoder(resp.Body).Decode(&cr)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// if !cr.Ok {
+	// 	return APIError{cr.Err}
+	// }
 
 	ch.Members = cr.Channel.Members
 	return nil

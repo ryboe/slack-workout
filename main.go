@@ -14,26 +14,26 @@ const (
 )
 
 func main() {
-	ch, err := slack.NewChannel("monkeytacos", "api-test")
+	// ch, err := slack.NewChannel("monkeytacos", "api-test")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// // DEBUG
+	// fmt.Println(ch)
+
+	mittens, err := slack.NewUser("monkeytacos", "sgtmittens")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// DEBUG
-	fmt.Println(ch)
+	fmt.Println(mittens)
 
-	u, err := slack.NewUser("monkeytacos", "sgtmittens")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = ch.UpdateMembers()
 
 	// DEBUG
-	fmt.Println(u)
-
-	err = ch.UpdateMembers()
-
-	// DEBUG
-	fmt.Println("ERR AFTER UPDATEMEMBERS()?:", err)
+	// fmt.Println("ERR AFTER UPDATEMEMBERS()?:", err)
 
 	// nextMember := make(chan string)
 	// go randomMember(ch, nextMember)
@@ -78,7 +78,7 @@ func main() {
 	// }
 }
 
-func randomMember(ch slack.Channel, nextMember chan string) {
+func randomMember(ch slack.Channel, mittensId string, nextMember chan string) {
 	var err error
 	for {
 		err = ch.UpdateMembers()
@@ -87,6 +87,12 @@ func randomMember(ch slack.Channel, nextMember chan string) {
 		}
 
 		i := rand.Intn(len(ch.Members))
+
+		// prevent mittens from picking self
+		for ch.Members[i] == mittensId {
+			i := rand.Intn(len(ch.Members))
+		}
+
 		nextMember <- ch.Members[i]
 	}
 }
