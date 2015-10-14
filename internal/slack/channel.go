@@ -102,8 +102,6 @@ func (ch *Channel) UpdateMembers() error {
 
 	if !cr.Ok {
 		return APIError{cr.Err}
-		// TODO: delete me
-		// return fmt.Errorf("Slack API returned error: %s", cr.Err)
 	}
 
 	ch.Members = cr.Channel.Members

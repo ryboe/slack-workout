@@ -63,3 +63,7 @@ func NewUser(team, name string) (User, error) {
 func (u User) String() string {
 	return fmt.Sprintf("User{Id: %s, Name: %s, Team: %s}", u.Id, u.Name, u.Team)
 }
+
+// TODO: write this
+// func (u User) Chat(msg, channel Channel) error {
+// }
