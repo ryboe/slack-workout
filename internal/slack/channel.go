@@ -13,14 +13,15 @@ const team = "monkeytacos"
 
 var apiToken string
 
-// TODO: can i get rid of one of these response types?
-type channelResponse struct {
-	Channel Channel `json:"channel"`
-	Ok      bool    `json:"ok"`
-	Err     string  `json:"error"`
+func init() {
+	apiToken = os.Getenv("SLACK_API_TOKEN")
+	if apiToken == "" {
+		log.Fatal("SLACK_API_TOKEN not set")
+	}
 }
 
-type channelListResponse struct {
+type channelResponse struct {
+	Channel  Channel   `json:"channel"`
 	Channels []Channel `json:"channels"`
 	Ok       bool      `json:"ok"`
 	Err      string    `json:"error"`
@@ -33,30 +34,23 @@ type Channel struct {
 	Team    string   // set in NewChannel
 }
 
-func init() {
-	apiToken = os.Getenv("SLACK_API_TOKEN")
-	if apiToken == "" {
-		log.Fatal("SLACK_API_TOKEN not set")
-	}
-}
-
 func NewChannel(name string) (Channel, error) {
 	var emptyChannel Channel
 
 	qsp := &url.Values{}
 	qsp.Set("channel", name)
 	listURL := NewURL("channels.list", qsp)
-	cl := channelListResponse{}
-	err := apiCall(listURL, &cl)
+	cr := channelResponse{}
+	err := apiCall(listURL, &cr)
 	if err != nil {
 		return emptyChannel, APIError{err.Error()}
 	}
 
-	if cl.Ok != true {
-		return emptyChannel, APIError{cl.Err}
+	if cr.Ok != true {
+		return emptyChannel, APIError{cr.Err}
 	}
 
-	for _, ch := range cl.Channels {
+	for _, ch := range cr.Channels {
 		if ch.Name == name {
 			ch.Team = team
 			return ch, nil
