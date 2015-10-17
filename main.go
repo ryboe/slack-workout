@@ -60,7 +60,7 @@ func main() {
 			pushUps,
 		)
 
-		if !closingSoon(now) {
+		if !closingSoon(now, loc) {
 			msg += "\nNext lottery for push-ups in 20 minutes"
 		}
 
@@ -132,7 +132,7 @@ func daysToMonday(day time.Weekday) int {
 }
 
 // Return true if closing time is in less than 20 minutes.
-func closingSoon(now time.Time) bool {
+func closingSoon(now time.Time, loc *time.Location) bool {
 	closingTime := time.Date(now.Year(), now.Month(), now.Day(), closingHour, 0, 0, 0, loc)
 	return closingTime.Sub(now) <= (20 * time.Minute)
 }
