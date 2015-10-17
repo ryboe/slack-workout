@@ -16,7 +16,7 @@ const (
 	openingHour = 10
 	openingMin  = 0
 	openingSec  = 0
-	closingHour = 6
+	closingHour = 18
 )
 
 func main() {
