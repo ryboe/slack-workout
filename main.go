@@ -38,8 +38,8 @@ func main() {
 	SgtMittens := slack.Bot{"SgtMitt"}
 
 	for {
-		t := time.Now().In(loc)
-		if closed, timeToOpen := isAfterHours(t, loc); closed {
+		now := time.Now().In(loc)
+		if closed, timeToOpen := isAfterHours(now, loc); closed {
 			time.Sleep(timeToOpen)
 			SgtMittens.PostMessage("RISE AND SHINE, CUPCAKES!", ch)
 		}
@@ -55,10 +55,14 @@ func main() {
 
 		pushUps := randInt(minPushUps, maxPushUps+1) // +1 because upper bound is non-inclusive
 		msg := fmt.Sprintf(
-			"@%s %d PUSH-UPS RIGHT MEOW!\nNext lottery for push-ups in 20 minutes",
+			"@%s %d PUSH-UPS RIGHT MEOW!",
 			user.Name,
 			pushUps,
 		)
+
+		if !closingSoon(now) {
+			msg += "\nNext lottery for push-ups in 20 minutes"
+		}
 
 		err = SgtMittens.PostMessage(msg, ch)
 		if err != nil {
@@ -125,4 +129,10 @@ func isWeekend(t time.Time) bool {
 func daysToMonday(day time.Weekday) int {
 	const weekdays = 7
 	return (weekdays - int(day-time.Monday)) % weekdays
+}
+
+// Return true if closing time is in less than 20 minutes.
+func closingSoon(now time.Time) bool {
+	closingTime := time.Date(now.Year(), now.Month(), now.Day(), closingHour, 0, 0, 0, loc)
+	return closingTime.Sub(now) <= (20 * time.Minute)
 }
