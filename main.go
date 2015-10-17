@@ -31,13 +31,13 @@ func main() {
 
 	// start async routine that chooses users randomly for push-ups
 	nextMemberID := make(chan string)
-	go randomMember(ch, nextMemberID)
+	go RandomMember(ch, nextMemberID)
 
 	SgtMittens := slack.Bot{"SgtMitt"}
 
 	for {
 		now := time.Now().In(loc)
-		if closed, timeToOpen := isAfterHours(now, loc); closed {
+		if closed, timeToOpen := IsAfterHours(now, loc); closed {
 			time.Sleep(timeToOpen)
 			SgtMittens.PostMessage("RISE AND SHINE, CUPCAKES!", ch)
 		}
@@ -51,14 +51,14 @@ func main() {
 			}
 		}
 
-		pushUps := randInt(minPushUps, maxPushUps+1) // +1 because upper bound is non-inclusive
+		pushUps := RandInt(minPushUps, maxPushUps+1) // +1 because upper bound is non-inclusive
 		msg := fmt.Sprintf(
 			"@%s %d PUSH-UPS RIGHT MEOW!",
 			user.Name,
 			pushUps,
 		)
 
-		if !closingSoon(now, loc) {
+		if !ClosingSoon(now, loc) {
 			msg += "\nNext lottery for push-ups in 20 minutes"
 		}
 
@@ -72,7 +72,9 @@ func main() {
 	}
 }
 
-func randomMember(ch slack.Channel, nextMemberID chan string) {
+// RandomMember updates the list of members in the given Slack channel and
+// returns a random member ID.
+func RandomMember(ch slack.Channel, nextMemberID chan string) {
 	var err error
 	for {
 		err = ch.UpdateMembers()
@@ -80,25 +82,27 @@ func randomMember(ch slack.Channel, nextMemberID chan string) {
 			log.Println(err)
 		}
 
-		i := randInt(0, len(ch.Members))
+		i := RandInt(0, len(ch.Members))
 		nextMemberID <- ch.Members[i]
 	}
 }
 
-func randInt(min, max int) int {
+// RandInt uses /dev/urandom to select a random integer in the range [min, max).
+func RandInt(min, max int) int {
 	n, err := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
 	if err != nil {
 		log.Println(err)
 	}
-	// return min if rand.Int() call fails
-	return int(n.Int64()) + min
+
+	return int(n.Int64()) + min // return min if rand.Int() call fails
 }
 
-func isAfterHours(now time.Time, loc *time.Location) (bool, time.Duration) {
-	var timeToOpen time.Duration
-
-	if isWeekend(now) {
-		days := daysToMonday(now.Weekday())
+// IsAfterHours returns true if the given time is after work hours at Omaze.
+// If Omaze is closed, IsAfterHours will return the duration until opening time
+// on Monday.
+func IsAfterHours(now time.Time, loc *time.Location) (closed bool, timeToOpen time.Duration) {
+	if IsWeekend(now) {
+		days := DaysToMonday(now.Weekday())
 		mondayOpeningTime := time.Date(now.Year(), now.Month(), now.Day()+days, openingHour, 0, 0, 0, loc)
 		timeToOpen = mondayOpeningTime.Sub(now)
 		return true, timeToOpen
@@ -119,18 +123,22 @@ func isAfterHours(now time.Time, loc *time.Location) (bool, time.Duration) {
 	return false, timeToOpen // 0 time
 }
 
-func isWeekend(t time.Time) bool {
+// IsWeekend returns true if the given time is Friday after closing time,
+// Saturday, or Sunday.
+func IsWeekend(t time.Time) bool {
 	day := t.Weekday()
 	return (day == time.Friday && t.Hour() >= closingHour) || day == time.Saturday || day == time.Sunday
 }
 
-func daysToMonday(day time.Weekday) int {
+// DaysToMonday returns the number of days from the given weekday to Monday.
+func DaysToMonday(day time.Weekday) int {
 	const weekdays = 7
 	return (weekdays - int(day-time.Monday)) % weekdays
 }
 
-// Return true if closing time is in less than 20 minutes.
-func closingSoon(now time.Time, loc *time.Location) bool {
+// ClosingSoon returns true if the given time is within 20 minutes of closing
+// time.
+func ClosingSoon(now time.Time, loc *time.Location) bool {
 	closingTime := time.Date(now.Year(), now.Month(), now.Day(), closingHour, 0, 0, 0, loc)
 	return closingTime.Sub(now) <= (20 * time.Minute)
 }
