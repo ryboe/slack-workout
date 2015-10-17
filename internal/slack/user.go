@@ -9,12 +9,6 @@ type userResponse struct {
 	Err  string `json:"error"`
 }
 
-type userListResponse struct {
-	Users []User `json:"members"`
-	Ok    bool   `json:"ok"`
-	Err   string `json:"error"`
-}
-
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
