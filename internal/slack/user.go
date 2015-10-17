@@ -39,5 +39,5 @@ func NewUser(id string) (User, error) {
 }
 
 func (u User) String() string {
-	return fmt.Sprintf("User{ID: %s, Name: %s, Team: %s}", u.ID, u.Name, u.Team)
+	return fmt.Sprintf("%#v", u)
 }

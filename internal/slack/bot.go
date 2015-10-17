@@ -1,15 +1,13 @@
 // TODO: write package comment
 package slack
 
-import "net/url"
+import (
+	"fmt"
+	"net/url"
+)
 
 type Bot struct {
 	Name string
-}
-
-type msgResponse struct {
-	Ok  bool   `json:"ok"`
-	Err string `json:"error"`
 }
 
 func (bot Bot) PostMessage(msg string, ch Channel) error {
@@ -31,4 +29,13 @@ func (bot Bot) PostMessage(msg string, ch Channel) error {
 	}
 
 	return nil
+}
+
+func (bot Bot) String() string {
+	return fmt.Sprintf("%#v", bot)
+}
+
+type msgResponse struct {
+	Ok  bool   `json:"ok"`
+	Err string `json:"error"`
 }

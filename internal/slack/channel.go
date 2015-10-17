@@ -67,7 +67,7 @@ func NewChannel(name string) (Channel, error) {
 }
 
 func (ch Channel) String() string {
-	return fmt.Sprintf("Channel{ID: %s, Name: %s, Members: %v, Team: %s}", ch.ID, ch.Name, ch.Members, ch.Team)
+	return fmt.Sprintf("%#v", ch)
 }
 
 func (ch *Channel) UpdateMembers() error {
