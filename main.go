@@ -14,8 +14,6 @@ const (
 	minPushUps  = 10
 	maxPushUps  = 30
 	openingHour = 10
-	openingMin  = 0
-	openingSec  = 0
 	closingHour = 18
 )
 
