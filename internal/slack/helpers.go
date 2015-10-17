@@ -1,4 +1,3 @@
-// TODO: write package comment
 package slack
 
 import (
@@ -16,7 +15,7 @@ func (err APIError) Error() string {
 	return fmt.Sprintf("Slack API returned error: %s", err.msg)
 }
 
-func NewURL(team, method string, qsp *url.Values) url.URL {
+func NewURL(method string, qsp *url.Values) url.URL {
 	if qsp == nil {
 		qsp = &url.Values{}
 	}

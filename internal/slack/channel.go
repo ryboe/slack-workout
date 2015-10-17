@@ -1,4 +1,5 @@
-// TODO: write package comment
+// Package slack implements the Channel type, for getting information about
+// Slack channels, and the User type, for sending chats.
 package slack
 
 import (
@@ -7,6 +8,8 @@ import (
 	"net/url"
 	"os"
 )
+
+const team = "monkeytacos"
 
 var apiToken string
 
@@ -37,16 +40,16 @@ func init() {
 	}
 }
 
-func NewChannel(team, name string) (Channel, error) {
+func NewChannel(name string) (Channel, error) {
 	var emptyChannel Channel
 
 	qsp := &url.Values{}
 	qsp.Set("channel", name)
-	listURL := NewURL(team, "channels.list", qsp)
+	listURL := NewURL("channels.list", qsp)
 	cl := channelListResponse{}
 	err := apiCall(listURL, &cl)
 	if err != nil {
-		return emptyChannel, err
+		return emptyChannel, APIError{err.Error()}
 	}
 
 	if cl.Ok != true {
@@ -70,12 +73,12 @@ func (ch Channel) String() string {
 func (ch *Channel) UpdateMembers() error {
 	qsp := &url.Values{}
 	qsp.Set("channel", ch.ID)
-	channelURL := NewURL(ch.Team, "channels.info", qsp)
+	channelURL := NewURL("channels.info", qsp)
 
 	cr := channelResponse{}
 	err := apiCall(channelURL, &cr)
 	if err != nil {
-		return err
+		return APIError{err.Error()}
 	}
 
 	if !cr.Ok {

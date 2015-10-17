@@ -3,6 +3,12 @@ package slack
 
 import "fmt"
 
+type userResponse struct {
+	User User   `json:"user"`
+	Ok   bool   `json:"ok"`
+	Err  string `json:"error"`
+}
+
 type userListResponse struct {
 	Users []User `json:"members"`
 	Ok    bool   `json:"ok"`
@@ -10,39 +16,28 @@ type userListResponse struct {
 }
 
 type User struct {
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 	Team string // set in NewUser
 }
 
-func NewUser(team, name string) (User, error) {
+func NewUser(id string) (User, error) {
 	var emptyUser User
 
-	userURL := NewURL(team, "users.list", nil)
-	ur := userListResponse{}
+	userURL := NewURL("users.info", nil)
+	ur := userResponse{}
 	err := apiCall(userURL, &ur)
 	if err != nil {
-		return emptyUser, err
+		return emptyUser, APIError{err.Error()}
 	}
 
 	if !ur.Ok {
 		return emptyUser, APIError{ur.Err}
 	}
 
-	for _, u := range ur.Users {
-		if u.Name == name {
-			u.Team = team
-			return u, nil
-		}
-	}
-
-	return emptyUser, fmt.Errorf("no user named %q on team %q", name, team)
+	return ur.User, nil
 }
 
 func (u User) String() string {
-	return fmt.Sprintf("User{Id: %s, Name: %s, Team: %s}", u.Id, u.Name, u.Team)
+	return fmt.Sprintf("User{ID: %s, Name: %s, Team: %s}", u.ID, u.Name, u.Team)
 }
-
-// TODO: write this
-// func (u User) Chat(msg, channel Channel) error {
-// }

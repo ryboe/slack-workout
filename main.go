@@ -1,84 +1,76 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
 	"log"
-	"math/rand"
+	"math/big"
+	"time"
 
 	"github.com/y0ssar1an/slack-pushups/internal/slack"
 )
 
 const (
-	minPushUps = 10
-	maxPushUps = 30
+	minPushUps  = 10
+	maxPushUps  = 30
+	openingHour = 10
+	openingMin  = 0
+	openingSec  = 0
+	closingHour = 6
 )
 
 func main() {
-	// ch, err := slack.NewChannel("monkeytacos", "api-test")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// // DEBUG
-	// fmt.Println(ch)
-
-	mittens, err := slack.NewUser("monkeytacos", "sgtmittens")
+	// fail early if zoneinfo db not present on server
+	loc, err := time.LoadLocation("America/Los_Angeles")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// DEBUG
-	fmt.Println(mittens)
+	ch, err := slack.NewChannel("api-test")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// err = ch.UpdateMembers()
+	// start async routine that chooses users randomly for push-ups
+	nextMemberID := make(chan string)
+	go randomMember(ch, nextMemberID)
 
-	// DEBUG
-	// fmt.Println("ERR AFTER UPDATEMEMBERS()?:", err)
+	SgtMittens := slack.Bot{"SgtMitt"}
 
-	// nextMember := make(chan string)
-	// go randomMember(ch, nextMember)
+	for {
+		t := time.Now().In(loc)
+		if closed, timeToOpen := isAfterHours(t, loc); closed {
+			time.Sleep(timeToOpen)
+			SgtMittens.PostMessage("RISE AND SHINE, CUPCAKES!", ch)
+		}
 
-	// // DEBUG
-	// // for i := 0; i < 1; i++ {
-	// // 	fmt.Println(<-nextMember)
-	// // }
+		var user slack.User
+		for user.Name == "" {
+			user, err = slack.NewUser(<-nextMemberID)
+			if err != nil {
+				log.Println(err)
+				time.Sleep(1 * time.Minute)
+			}
+		}
 
-	// var pushUps int
-	// for {
-	// 	t := time.UTC()
-	// 	if closed, timeToOpen := isAfterHours(t); closed {
-	// 		time.Sleep(timeToOpen)
+		pushUps := randInt(minPushUps, maxPushUps+1) // +1 because upper bound is non-inclusive
+		msg := fmt.Sprintf(
+			"@%s %d PUSH-UPS RIGHT MEOW!\nNext lottery for push-ups in 20 minutes",
+			user.Name,
+			pushUps,
+		)
 
-	// 		// TODO: rise and shine message here
-	// 	}
-
-	// 	// TODO: get user name from users.info
-	// 	var user slack.User
-	// 	for user.Name == "" {
-	// 		user, err = slack.NewUser(<-nextMember)
-	// 		if err != nil {
-	// 			log.Println(err)
-	// 			time.Sleep(1 * time.Minute)
-	// 		}
-	// 	}
-
-	// 	// TODO: write slack.Bot
-
-	// 	pushUps = randPushUps(minPushUps, maxPushUps)
-	// 	msg := fmt.Sprintf(
-	// 		"%d PUSH-UPS RIGHT MEOW! @%s\nNext lottery for push-ups in 20 minutes",
-	// 		pushUps,
-	// 		user.Name,
-	// 	)
-	// 	err = bot.Msg(msg)
-	// 	if err != nil {
-	// 		log.Println(err)
-	// 	}
-	// 	time.Sleep(20 * time.Minute)
-	// }
+		err = SgtMittens.PostMessage(msg, ch)
+		if err != nil {
+			log.Println(err)
+			time.Sleep(1 * time.Minute)
+			continue
+		}
+		time.Sleep(20 * time.Minute)
+	}
 }
 
-func randomMember(ch slack.Channel, mittensId string, nextMember chan string) {
+func randomMember(ch slack.Channel, nextMemberID chan string) {
 	var err error
 	for {
 		err = ch.UpdateMembers()
@@ -86,17 +78,51 @@ func randomMember(ch slack.Channel, mittensId string, nextMember chan string) {
 			log.Println(err)
 		}
 
-		i := rand.Intn(len(ch.Members))
-
-		// prevent mittens from picking self
-		for ch.Members[i] == mittensId {
-			i = rand.Intn(len(ch.Members))
-		}
-
-		nextMember <- ch.Members[i]
+		i := randInt(0, len(ch.Members))
+		nextMemberID <- ch.Members[i]
 	}
 }
 
-func randPushUps(min, max int) int {
-	return rand.Intn(max-min+1) + min
+func randInt(min, max int) int {
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(max-min)))
+	if err != nil {
+		log.Println(err)
+	}
+	// return min if rand.Int() call fails
+	return int(n.Int64()) + min
+}
+
+func isAfterHours(now time.Time, loc *time.Location) (bool, time.Duration) {
+	var timeToOpen time.Duration
+
+	if isWeekend(now) {
+		days := daysToMonday(now.Weekday())
+		mondayOpeningTime := time.Date(now.Year(), now.Month(), now.Day()+days, openingHour, 0, 0, 0, loc)
+		timeToOpen = mondayOpeningTime.Sub(now)
+		return true, timeToOpen
+	}
+
+	if now.Hour() < openingHour {
+		openToday := time.Date(now.Year(), now.Month(), now.Day(), openingHour, 0, 0, 0, loc)
+		timeToOpen = openToday.Sub(now)
+		return true, timeToOpen
+	}
+
+	if now.Hour() >= closingHour {
+		openTomorrow := time.Date(now.Year(), now.Month(), now.Day()+1, openingHour, 0, 0, 0, loc)
+		timeToOpen = openTomorrow.Sub(now)
+		return true, timeToOpen
+	}
+
+	return false, timeToOpen // 0 time
+}
+
+func isWeekend(t time.Time) bool {
+	day := t.Weekday()
+	return (day == time.Friday && t.Hour() >= closingHour) || day == time.Saturday || day == time.Sunday
+}
+
+func daysToMonday(day time.Weekday) int {
+	const weekdays = 7
+	return (weekdays - int(day-time.Monday)) % weekdays
 }
