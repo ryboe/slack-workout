@@ -18,8 +18,7 @@ const (
 )
 
 func main() {
-	// fail early if zoneinfo db not present on server
-	loc, err := time.LoadLocation("America/Los_Angeles")
+	loc, err := time.FixedZone("PST", -8*60*60)
 	if err != nil {
 		log.Fatal(err)
 	}
