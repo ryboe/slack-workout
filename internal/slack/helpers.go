@@ -7,6 +7,7 @@ import (
 	"net/url"
 )
 
+// An APIError is an error returned by the Slack API.
 type APIError struct {
 	msg string
 }
@@ -15,6 +16,8 @@ func (err APIError) Error() string {
 	return fmt.Sprintf("Slack API returned error: %s", err.msg)
 }
 
+// NewURL returns a valid endpoint for the Slack API, with a properly escaped
+// query string.
 func NewURL(method string, qsp *url.Values) url.URL {
 	if qsp == nil {
 		qsp = &url.Values{}

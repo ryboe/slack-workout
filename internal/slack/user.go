@@ -1,4 +1,3 @@
-// TODO: write package comment
 package slack
 
 import "fmt"
@@ -9,12 +8,16 @@ type userResponse struct {
 	Err  string `json:"error"`
 }
 
+// A User contains information about a Slack user. It is populated from the
+// Slack API.
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 	Team string // set in NewUser
 }
 
+// NewUser takes the given Slack user ID (e.g. "U023BECGF") and populates a new
+// User from the Slack API.
 func NewUser(id string) (User, error) {
 	var emptyUser User
 
@@ -32,6 +35,7 @@ func NewUser(id string) (User, error) {
 	return ur.User, nil
 }
 
+// String returns a human-readable string representation of a User.
 func (u User) String() string {
 	return fmt.Sprintf("%#v", u)
 }

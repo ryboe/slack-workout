@@ -1,5 +1,3 @@
-// Package slack implements the Channel type, for getting information about
-// Slack channels, and the User type, for sending chats.
 package slack
 
 import (
@@ -27,6 +25,8 @@ type channelResponse struct {
 	Err      string    `json:"error"`
 }
 
+// A Channel contains the name, id, and member list of a Slack channel
+// (e.g. #general).
 type Channel struct {
 	ID      string   `json:"id"`
 	Name    string   `json:"name"`
@@ -34,6 +34,8 @@ type Channel struct {
 	Team    string   // set in NewChannel
 }
 
+// NewChannel takes a channel name (e.g. "general" for #general) and returns
+// a Channel with ID and member list populated from the Slack API.
 func NewChannel(name string) (Channel, error) {
 	var emptyChannel Channel
 
@@ -60,10 +62,12 @@ func NewChannel(name string) (Channel, error) {
 	return emptyChannel, fmt.Errorf("no channel named %q on team %q", name, team)
 }
 
+// String returns a human-readable string representation of a Channel.
 func (ch Channel) String() string {
 	return fmt.Sprintf("%#v", ch)
 }
 
+// UpdateMembers updates a Channel's member list through the Slack API.
 func (ch *Channel) UpdateMembers() error {
 	qsp := &url.Values{}
 	qsp.Set("channel", ch.ID)

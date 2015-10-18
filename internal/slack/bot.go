@@ -1,4 +1,3 @@
-// TODO: write package comment
 package slack
 
 import (
@@ -6,10 +5,12 @@ import (
 	"net/url"
 )
 
+// A Bot is a fakey Slack user that can post messages.
 type Bot struct {
 	Name string
 }
 
+// PostMessage posts the given message to the given Channel.
 func (bot Bot) PostMessage(msg string, ch Channel) error {
 	qsp := &url.Values{}
 	qsp.Set("channel", ch.ID)
@@ -31,6 +32,7 @@ func (bot Bot) PostMessage(msg string, ch Channel) error {
 	return nil
 }
 
+// String returns a human-readable string representation of a Bot.
 func (bot Bot) String() string {
 	return fmt.Sprintf("%#v", bot)
 }
