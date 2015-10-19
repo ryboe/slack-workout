@@ -18,10 +18,7 @@ const (
 )
 
 func main() {
-	loc, err := time.FixedZone("PST", -8*60*60)
-	if err != nil {
-		log.Fatal(err)
-	}
+	loc := time.FixedZone("PST", -8*60*60)
 
 	ch, err := slack.NewChannel("api-test")
 	if err != nil {
