@@ -1,0 +1,23 @@
+#cloud-config
+
+coreos:
+  units:
+    - name: slack-pushups.service
+      command: start
+      content: |
+        [Unit]
+        Description=Slack Push-Ups Service
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        Environment="SLACK_API_TOKEN=<SECRET TOKEN HERE>"
+        TimeoutStartSec=0
+        ExecStartPre=-/usr/bin/docker kill pushups
+        ExecStartPre=-/usr/bin/docker rm pushups
+        ExecStartPre=/usr/bin/docker pull y0ssar1an/slack-pushups
+        ExecStart=/usr/bin/docker run --name pushups -p 8001:8001 -e SLACK_API_TOKEN=$SLACK_API_TOKEN y0ssar1an/slack-pushups
+        ExecStop=/usr/bin/docker stop pushups
+
+        [Install]
+        WantedBy=multi-user.target
