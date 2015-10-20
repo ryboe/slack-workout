@@ -19,8 +19,6 @@ const (
 )
 
 func main() {
-	loc := time.FixedZone("PST", -8*60*60)
-
 	ch, err := slack.NewChannel("api-test")
 	if err != nil {
 		log.Fatal(err)
@@ -32,9 +30,13 @@ func main() {
 
 	SgtMittens := slack.Bot{"SgtMitt"}
 
+	// DEBUG
+	sgtMittens.PostMessage("this is a test", ch)
+
+	loc := time.FixedZone("PST", -8*60*60)
 	for {
 		now := time.Now().In(loc)
-		if closed, timeToOpen := IsAfterHours(now, loc); closed {
+		if closed, timeToOpen := IsAfterHours(now); closed {
 			time.Sleep(timeToOpen)
 			SgtMittens.PostMessage("RISE AND SHINE, CUPCAKES!", ch)
 		}
@@ -97,7 +99,8 @@ func RandInt(min, max int) int {
 // IsAfterHours returns true if the given time is after work hours at Omaze.
 // If Omaze is closed, IsAfterHours will return the duration until opening time
 // on Monday.
-func IsAfterHours(now time.Time, loc *time.Location) (closed bool, timeToOpen time.Duration) {
+func IsAfterHours(now time.Time) (closed bool, timeToOpen time.Duration) {
+	loc := now.Location()
 	if IsWeekend(now) {
 		days := DaysToMonday(now.Weekday())
 		mondayOpeningTime := time.Date(now.Year(), now.Month(), now.Day()+days, openingHour, 0, 0, 0, loc)
@@ -129,13 +132,13 @@ func IsWeekend(t time.Time) bool {
 
 // DaysToMonday returns the number of days from the given weekday to Monday.
 func DaysToMonday(day time.Weekday) int {
-	const weekdays = 7
 	return (weekdays - int(day-time.Monday)) % weekdays
 }
 
 // ClosingSoon returns true if the given time is within 20 minutes of closing
 // time.
-func ClosingSoon(now time.Time, loc *time.Location) bool {
+func ClosingSoon(now time.Time) bool {
+	loc := now.Location()
 	closingTime := time.Date(now.Year(), now.Month(), now.Day(), closingHour, 0, 0, 0, loc)
 	return closingTime.Sub(now) <= (20 * time.Minute)
 }
