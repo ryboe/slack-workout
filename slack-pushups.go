@@ -28,7 +28,7 @@ func main() {
 	nextMemberID := make(chan string)
 	go RandomMember(ch, nextMemberID)
 
-	SgtMittens := slack.Bot{"SgtMitt"}
+	sgtMittens := slack.Bot{"SgtMittens"}
 
 	// DEBUG
 	sgtMittens.PostMessage("this is a test", ch)
@@ -38,7 +38,7 @@ func main() {
 		now := time.Now().In(loc)
 		if closed, timeToOpen := IsAfterHours(now); closed {
 			time.Sleep(timeToOpen)
-			SgtMittens.PostMessage("RISE AND SHINE, CUPCAKES!", ch)
+			sgtMittens.PostMessage("RISE AND SHINE, CUPCAKES!", ch)
 		}
 
 		var user slack.User
@@ -57,11 +57,11 @@ func main() {
 			pushUps,
 		)
 
-		if !ClosingSoon(now, loc) {
+		if !ClosingSoon(now) {
 			msg += "\nNext lottery for push-ups in 20 minutes"
 		}
 
-		err = SgtMittens.PostMessage(msg, ch)
+		err = sgtMittens.PostMessage(msg, ch)
 		if err != nil {
 			log.Println(err)
 			time.Sleep(1 * time.Minute)
