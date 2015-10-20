@@ -15,6 +15,7 @@ const (
 	maxPushUps  = 30
 	openingHour = 10
 	closingHour = 18
+	weekdays    = 7
 )
 
 func main() {
