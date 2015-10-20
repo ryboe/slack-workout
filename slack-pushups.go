@@ -30,9 +30,6 @@ func main() {
 
 	sgtMittens := slack.Bot{"SgtMittens"}
 
-	// DEBUG
-	sgtMittens.PostMessage("this is a test", ch)
-
 	loc := time.FixedZone("PST", -8*60*60)
 	for {
 		now := time.Now().In(loc)
