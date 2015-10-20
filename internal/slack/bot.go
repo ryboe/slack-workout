@@ -13,8 +13,8 @@ type Bot struct {
 // PostMessage posts the given message to the given Channel.
 func (bot Bot) PostMessage(msg string, ch Channel) error {
 	qsp := &url.Values{}
-	qsp.Set("channel", ch.ID)
-	qsp.Set("icon_url", "https://www.dropbox.com/s/w7hyhjdeylqemx1/sgt_mittens.jpg?dl=0")
+	qsp.Set("channel", "#"+ch.Name)
+	qsp.Set("icon_url", "http://i.imgur.com/XpotArk.jpg")
 	qsp.Set("text", msg)
 	qsp.Set("username", bot.Name)
 	botURL := NewURL("chat.postMessage", qsp)
