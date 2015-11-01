@@ -19,7 +19,7 @@ const (
 )
 
 func main() {
-	ch, err := slack.NewChannel("pushups")
+	ch, err := slack.NewChannel("general")
 	if err != nil {
 		log.Fatal(err)
 	}
