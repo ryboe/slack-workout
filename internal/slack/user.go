@@ -1,6 +1,9 @@
 package slack
 
-import "fmt"
+import (
+	"fmt"
+	"net/url"
+)
 
 type userResponse struct {
 	User User   `json:"user"`
@@ -21,7 +24,10 @@ type User struct {
 func NewUser(id string) (User, error) {
 	var emptyUser User
 
-	userURL := NewURL("users.info", nil)
+	qsp := &url.Values{}
+	qsp.Set("user", id)
+	userURL := NewURL("users.info", qsp)
+
 	ur := userResponse{}
 	err := apiCall(userURL, &ur)
 	if err != nil {

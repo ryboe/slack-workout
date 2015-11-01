@@ -12,30 +12,34 @@ import (
 
 const (
 	minPushUps  = 10
-	maxPushUps  = 30
+	maxPushUps  = 20
 	openingHour = 10
 	closingHour = 18
 	weekdays    = 7
 )
 
 func main() {
-	ch, err := slack.NewChannel("api-test")
+	ch, err := slack.NewChannel("pushups")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// start async routine that chooses users randomly for push-ups
+	loc, err := time.LoadLocation("America/Los_Angeles")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// start async goroutine that chooses users randomly for push-ups
 	nextMemberID := make(chan string)
 	go RandomMember(ch, nextMemberID)
 
 	sgtMittens := slack.Bot{"SgtMittens"}
 
-	loc := time.FixedZone("PST", -8*60*60)
 	for {
 		now := time.Now().In(loc)
 		if closed, timeToOpen := IsAfterHours(now); closed {
 			time.Sleep(timeToOpen)
-			sgtMittens.PostMessage("RISE AND SHINE, CUPCAKES!", ch)
+			sgtMittens.PostMessage("RISE AND SHINE, KITTENS!", ch)
 		}
 
 		var user slack.User
@@ -48,11 +52,7 @@ func main() {
 		}
 
 		pushUps := RandInt(minPushUps, maxPushUps+1) // +1 because upper bound is non-inclusive
-		msg := fmt.Sprintf(
-			"@%s %d PUSH-UPS RIGHT MEOW!",
-			user.Name,
-			pushUps,
-		)
+		msg := fmt.Sprintf("@%s %d PUSH-UPS RIGHT MEOW!", user.Name, pushUps)
 
 		if !ClosingSoon(now) {
 			msg += "\nNext lottery for push-ups in 20 minutes"

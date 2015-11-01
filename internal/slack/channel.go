@@ -42,6 +42,7 @@ func NewChannel(name string) (Channel, error) {
 	qsp := &url.Values{}
 	qsp.Set("channel", name)
 	listURL := NewURL("channels.list", qsp)
+
 	cr := channelResponse{}
 	err := apiCall(listURL, &cr)
 	if err != nil {
