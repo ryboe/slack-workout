@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-const team = "monkeytacos"
+const team = "omaze"
 
 var apiToken string
 
