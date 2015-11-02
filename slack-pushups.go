@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	minPushUps  = 10
-	maxPushUps  = 20
-	openingHour = 10
-	closingHour = 18
-	weekdays    = 7
+	minPushups     = 10
+	maxPushups     = 20
+	pushupInterval = 30
+	openingHour    = 10
+	closingHour    = 18
+	weekdays       = 7
 )
 
 func main() {
@@ -51,11 +52,11 @@ func main() {
 			}
 		}
 
-		pushUps := RandInt(minPushUps, maxPushUps+1) // +1 because upper bound is non-inclusive
+		pushUps := RandInt(minPushups, maxPushups+1) // +1 because upper bound is non-inclusive
 		msg := fmt.Sprintf("@%s %d PUSH-UPS RIGHT MEOW!", user.Name, pushUps)
 
 		if !ClosingSoon(now) {
-			msg += "\nNext lottery for push-ups in 20 minutes"
+			msg += fmt.Sprintf("\nNext lottery for push-ups in %d minutes", pushupInterval)
 		}
 
 		err = sgtMittens.PostMessage(msg, ch)
@@ -64,7 +65,7 @@ func main() {
 			time.Sleep(1 * time.Minute)
 			continue
 		}
-		time.Sleep(20 * time.Minute)
+		time.Sleep(pushupInterval * time.Minute)
 	}
 }
 
