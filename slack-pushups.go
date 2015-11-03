@@ -133,10 +133,10 @@ func DaysToMonday(day time.Weekday) int {
 	return (weekdays - int(day-time.Monday)) % weekdays
 }
 
-// ClosingSoon returns true if the given time is within 20 minutes of closing
-// time.
+// ClosingSoon returns true if the given time is within pushupInterval minutes
+// of closing time.
 func ClosingSoon(now time.Time) bool {
 	loc := now.Location()
 	closingTime := time.Date(now.Year(), now.Month(), now.Day(), closingHour, 0, 0, 0, loc)
-	return closingTime.Sub(now) <= (20 * time.Minute)
+	return closingTime.Sub(now) <= (pushupInterval * time.Minute)
 }
