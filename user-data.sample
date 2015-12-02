@@ -2,21 +2,21 @@
 
 coreos:
   units:
-    - name: slack-pushups.service
+    - name: slack-workout.service
       command: start
       content: |
         [Unit]
-        Description=Slack Push-Ups Service
+        Description=Slack Workout Service
         After=docker.service
         Requires=docker.service
 
         [Service]
         TimeoutStartSec=0
-        ExecStartPre=-/usr/bin/docker kill pushups
-        ExecStartPre=-/usr/bin/docker rm pushups
-        ExecStartPre=/usr/bin/docker pull y0ssar1an/slack-pushups
-        ExecStart=/usr/bin/docker run --name pushups -p 8001:8001 -e SLACK_API_TOKEN=<slack api token here> y0ssar1an/slack-pushups
-        ExecStop=/usr/bin/docker stop pushups
+        ExecStartPre=-/usr/bin/docker kill workout
+        ExecStartPre=-/usr/bin/docker rm workout
+        ExecStartPre=/usr/bin/docker pull y0ssar1an/slack-workout
+        ExecStart=/usr/bin/docker run --name workout -p 8001:8001 -e SLACK_API_TOKEN=<slack api token here> y0ssar1an/slack-workout
+        ExecStop=/usr/bin/docker stop workout
         Restart=always
 
         [Install]

@@ -7,16 +7,16 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/y0ssar1an/slack-pushups/internal/slack"
+	"github.com/y0ssar1an/slack-workout/internal/slack"
 )
 
 const (
-	minPushups     = 10
-	maxPushups     = 20
-	pushupInterval = 30
-	openingHour    = 10
-	closingHour    = 18
-	weekdays       = 7
+	minReps         = 10
+	maxReps         = 20
+	workoutInterval = 30
+	openingHour     = 10
+	closingHour     = 18
+	weekdays        = 7
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// start async goroutine that chooses users randomly for push-ups
+	// start async goroutine that chooses users randomly
 	nextMemberID := make(chan string)
 	go RandomMember(ch, nextMemberID)
 
@@ -52,11 +52,11 @@ func main() {
 			}
 		}
 
-		pushUps := RandInt(minPushups, maxPushups+1) // +1 because upper bound is non-inclusive
-		msg := fmt.Sprintf("@%s %d PUSH-UPS RIGHT MEOW!", user.Name, pushUps)
+		reps := RandInt(minReps, maxReps+1) // +1 because upper bound is non-inclusive
+		msg := fmt.Sprintf("@%s %d PUSH-UPS RIGHT MEOW!", user.Name, reps)
 
 		if !ClosingSoon(now) {
-			msg += fmt.Sprintf("\nNext lottery for push-ups in %d minutes", pushupInterval)
+			msg += fmt.Sprintf("\nNext lottery for workout in %d minutes", workoutInterval)
 		}
 
 		err = sgtMittens.PostMessage(msg, ch)
@@ -65,7 +65,7 @@ func main() {
 			time.Sleep(1 * time.Minute)
 			continue
 		}
-		time.Sleep(pushupInterval * time.Minute)
+		time.Sleep(workoutInterval * time.Minute)
 	}
 }
 
@@ -133,10 +133,10 @@ func DaysToMonday(day time.Weekday) int {
 	return (weekdays - int(day-time.Monday)) % weekdays
 }
 
-// ClosingSoon returns true if the given time is within pushupInterval minutes
+// ClosingSoon returns true if the given time is within workoutInterval minutes
 // of closing time.
 func ClosingSoon(now time.Time) bool {
 	loc := now.Location()
 	closingTime := time.Date(now.Year(), now.Month(), now.Day(), closingHour, 0, 0, 0, loc)
-	return closingTime.Sub(now) <= (pushupInterval * time.Minute)
+	return closingTime.Sub(now) <= (workoutInterval * time.Minute)
 }

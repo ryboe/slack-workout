@@ -11,10 +11,10 @@ Vagrant.configure("2") do |config|
     config.ssh.insert_key = false  # always use Vagrant's insecure default key
     config.vm.box = "coreos-stable"
     config.vm.box_url = "http://stable.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
-    vm_name = "slack-pushups-host"
+    vm_name = "slack-workout-host"
     config.vm.hostname = vm_name
 
-    # will appear as "slack-pushups-host" in Vagrant CLI
+    # will appear as "slack-workout-host" in Vagrant CLI
     config.vm.define vm_name do |name|
     end
 
