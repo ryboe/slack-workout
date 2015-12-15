@@ -36,7 +36,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// start async goroutine that chooses users randomly
+	// start async goroutine that chooses users randomly. there's no reason
+	// to do this async, but this is a learning project so ¯\_(ツ)_/¯
 	nextMemberID := make(chan string)
 	go RandomMember(ch, nextMemberID)
 
