@@ -11,13 +11,19 @@ import (
 )
 
 const (
-	minReps         = 10
-	maxReps         = 20
-	workoutInterval = 30
-	openingHour     = 10
+	minJumpingJacks = 20
+	maxJumpingJacks = 40
+	minPushUps      = 10
+	maxPushUps      = 20
+	minSitUps       = 10
+	maxSitUps       = 20
 	closingHour     = 18
+	openingHour     = 10
 	weekdays        = 7
+	workoutInterval = 30
 )
+
+var exercises = []string{"JUMPING JACKS", "PUSH-UPS", "SIT-UPS"}
 
 func main() {
 	ch, err := slack.NewChannel("workout")
@@ -52,8 +58,8 @@ func main() {
 			}
 		}
 
-		reps := RandInt(minReps, maxReps+1) // +1 because upper bound is non-inclusive
-		msg := fmt.Sprintf("@%s %d PUSH-UPS RIGHT MEOW!", user.Name, reps)
+		exercise, reps := RandExercise()
+		msg := fmt.Sprintf("@%s %d %s RIGHT MEOW!", user.Name, reps, exercise)
 
 		if !ClosingSoon(now) {
 			msg += fmt.Sprintf("\nNext lottery for workout in %d minutes", workoutInterval)
@@ -92,6 +98,22 @@ func RandInt(min, max int) int {
 	}
 
 	return int(n.Int64()) + min // return min if rand.Int() call fails
+}
+
+// RandExercise returns a random exercise from the slice of exercises and a
+// random number of reps.
+func RandExercise() (exercise string, reps int) {
+	exercise = exercises[RandInt(0, len(exercises))]
+	switch exercise {
+	case "JUMPING JACKS":
+		reps = RandInt(minJumpingJacks, maxJumpingJacks+1) // +1 because upper bound is non-inclusive
+	case "PUSH-UPS":
+		reps = RandInt(minPushUps, maxPushUps+1)
+	case "SIT-UPS":
+		reps = RandInt(minSitUps, maxSitUps+1)
+	}
+
+	return exercise, reps
 }
 
 // IsAfterHours returns true if the given time is after work hours at Omaze.
