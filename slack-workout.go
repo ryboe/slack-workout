@@ -37,7 +37,7 @@ func main() {
 	nextMemberID := make(chan string)
 	go RandomMember(ch, nextMemberID)
 
-	sgtMittens := slack.Bot{"SgtMittens"}
+	sgtMittens := slack.Bot{Name: "SgtMittens"}
 
 	for {
 		now := time.Now().In(loc)
