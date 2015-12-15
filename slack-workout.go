@@ -19,7 +19,7 @@ const (
 	workoutInterval = 30
 )
 
-var exercises = []string{"JUMPING JACKS", "PUSH-UPS", "SIT-UPS"}
+var exercises = []string{"JUMPING JACKS", "PUSH-UPS", "SQUATS"}
 
 func main() {
 	ch, err := slack.NewChannel("workout")
